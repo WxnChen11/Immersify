@@ -8,20 +8,21 @@
   <body>
     <div class='row'>
      <div class="col-md-6">
-    <div id="map" style='height:550px; width:685px;margin-left: 16px;'></div>
+    <div id="map" style='height:550px; width:100%;padding-left: 16px;'></div>
      </div>
-          <button class="btn btn-success btn-lg" id = 'process_button' type="submit" style='top:210px;left:645px;margin-left:0px;position:absolute;z-index: 10'>Immersify</button>
+          <img src="logo.png" style="width:200x;height:115px; margin: 0 auto; left:0;right:0;position:absolute;">
+          <button class="btn btn-success btn-lg" id = 'process_button' type="submit" style='top:210px;margin:0 auto;left:0;right:0;position:absolute;z-index: 10;width:120px;'>Immersify</button>
 
           <form style="width:30px;">
-            <div class="form-group" style='top:266px;left:664px;margin-left:0px;position:absolute;z-index: 10;'>
+            <div class="form-group" style='top:266px;margin:0 auto;left:0;right:0;position:absolute;z-index: 10;width:65px;'>
               <label for=""></label>
               <input type="text" id="partitions_field" name="partitions_form" placeholder="Partitions" style='width:65px'>
             </div>
           </form>
 
-          <button class="btn btn-primary btn-lg" id = 'translate_button' type="submit" style='top:330px;left:645px;margin-left:0px;position:absolute;z-index: 10'>Translate</button>
+          <button class="btn btn-primary btn-lg" id = 'translate_button' type="submit" style='top:330px;margin:0 auto;left:0;right:0;position:absolute;z-index: 10;width:120px;'>Translate</button>
 
-          <div class="form-group input-sm" style='top:143px;left:643px;margin-left:0px;position:absolute;z-index: 10;width:120px;'>
+          <div class="form-group input-sm" style='top:143px;margin:0 auto;left:0;right:0;position:absolute;z-index: 10;width:120px;'>
             <label for="language"></label>
             <select class="form-control" id="lang_list">
               <option>English</option>
@@ -32,7 +33,7 @@
             </select>
           </div>
     <div class="col-md-6">
-    <div id="image" style='padding-left: 10px;'><img height='550px' width='660px' id='img_src'></div>
+    <div id="image" style='height:550px; width:100%;'><img id='img_src'></div>
     <div id='labels'></div>
     </div>
 
@@ -49,7 +50,7 @@
       }
 
       document.getElementById("process_button").onclick = function actual_translate(){
-        
+
       }
 
       document.getElementById("process_button").onclick = function translate() {
@@ -143,11 +144,11 @@
       function httpGetAsync(theUrl, callback)
         {
             var xmlHttp = new XMLHttpRequest();
-            xmlHttp.onreadystatechange = function() { 
+            xmlHttp.onreadystatechange = function() {
                 if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
                     callback(xmlHttp.responseText);
             }
-            xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+            xmlHttp.open("GET", theUrl, true); // true for asynchronous
             xmlHttp.send(null);
         }
     </script>

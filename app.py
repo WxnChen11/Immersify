@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 import requests
 import os
 import cv2
@@ -47,7 +47,7 @@ def populate_img_list(no_partitions, height, width, img):
 
 @app.route('/')
 def hello_world():
-    return 'Hello, World!'
+    return render_template('index.html')
 
 @app.route('/find_features')
 def find_features():
@@ -66,7 +66,7 @@ def find_features():
 
 	print("https://maps.googleapis.com/maps/api/streetview?location="+lat+","+lng+"&size=800x550&key=AIzaSyAi5tI84OEg4rQ05u7GPC9Ja9AIQ4z0ni4&heading="+head+"&pitch="+pitch)
 	r = requests.get("https://maps.googleapis.com/maps/api/streetview?location="+lat+","+lng+"&size=800x550&key=AIzaSyAi5tI84OEg4rQ05u7GPC9Ja9AIQ4z0ni4&heading="+head+"&pitch="+pitch+"&fov="+fov)
-	
+
 	with open('image.jpg', 'wb') as f:
 		f.write(r.content)
 
