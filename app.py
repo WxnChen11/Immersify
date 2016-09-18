@@ -6,7 +6,6 @@ import numpy as np
 import base64
 import json
 import math
-
 print(os.getcwd())
 
 app = Flask(__name__)
@@ -48,6 +47,60 @@ def populate_img_list(no_partitions, height, width, img):
 @app.route('/')
 def hello_world():
     return 'Hello, World!'
+
+@app.route('/translate')
+def translate():
+	print("getting args")
+	lat = str(request.args.get('lat'))
+	lng = str(request.args.get('lng'))
+	head = str(request.args.get('head'))
+	pitch = str(request.args.get('pitch'))
+	fov = str(request.args.get('fov'))
+	zoom = str(request.args.get('zoom'))
+	number_partitions = int(str(request.args.get('partitions')))
+	lang = str(request.args.get('lang'))
+
+	r = requests.get("https://maps.googleapis.com/maps/api/streetview?location="+lat+","+lng+"&size=800x550&key=AIzaSyAi5tI84OEg4rQ05u7GPC9Ja9AIQ4z0ni4&heading="+head+"&pitch="+pitch+"&fov="+fov)
+
+	with open('image.jpg', 'wb') as f:
+		f.write(r.content)
+
+	filename = 'image.jpg'
+
+	height = 535
+	width = 600
+
+	img = cv2.imread(filename)
+	img = img[0:535, 0:600]
+
+	cv2.imwrite('image.jpg', img)
+
+	with open('image.jpg', 'rb') as f:
+		encoded_img = base64.b64encode(f.read())
+
+	request_list = {
+		'image' : {
+			'content' : encoded_img
+		},
+
+		'features' : [{
+			'type' : 'TEXT_DETECTION',
+			'maxResults' : 6,
+		}]
+	}
+
+	api_request = {'requests' : request_list}
+
+	json_data = json.dumps(api_request)
+
+	r = requests.post("https://vision.googleapis.com/v1/images:annotate?key=AIzaSyAi5tI84OEg4rQ05u7GPC9Ja9AIQ4z0ni4", data=json_data)
+
+	response_data = r.json()
+
+	print(json.dumps(response_data['responses'][0]))
+
+	return json.dumps(response_data['responses'][0])
+
 
 @app.route('/find_features')
 def find_features():

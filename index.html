@@ -34,11 +34,18 @@
     <div class="col-md-6">
     <div id="image" style='padding-left: 10px;'><img height='550px' width='660px' id='img_src'></div>
     <div id='labels'></div>
+    <canvas id="myCanvas" width="660" height="550" style="border:0px solid #000000; position:absolute;left:26px;top:0px;z-index:1;"></canvas>
+
     </div>
 
 
     </div>
     <script>
+      
+      var c = document.getElementById("myCanvas");
+
+      c2 = c.getContext('2d');
+
       function initMap() {
         // Create a map object and specify the DOM element for display.
         map = new google.maps.Map(document.getElementById('map'), {
@@ -48,9 +55,154 @@
         });
       }
 
-      document.getElementById("process_button").onclick = function actual_translate(){
-        
-      }
+      no_trans = 2;
+
+      document.getElementById("translate_button").onclick = function actual_translate(){
+
+        var myNode = document.getElementById("labels");
+        while (myNode.firstChild) {
+            myNode.removeChild(myNode.firstChild);
+        }
+
+        c2.clearRect(0, 0, 660, 550)
+
+        var partitions = document.getElementById("partitions_field").value;
+
+        if (partitions == null || partitions == "") {
+          alert("Name must be filled out");
+          return;
+        }
+
+        var id = document.getElementById("lang_list").selectedIndex;
+
+        if(id == 0){
+          lang = 'en';
+        }
+        if(id == 1){
+          lang = 'fr'
+        }
+        if(id == 2){
+          lang = 'de'
+        }
+        if(id == 3){
+          lang = 'it'
+        }
+        if(id == 4){
+          lang = 'zh-CN'
+        }
+
+        var lat = map.getStreetView().getPosition().lat();
+        var lng = map.getStreetView().getPosition().lng();
+
+        var head = map.getStreetView().getPov().heading;
+        var pitch = map.getStreetView().getPov().pitch;
+
+        var zoom = map.getStreetView().getZoom();
+
+        httpGetAsync("http://127.0.0.1:5000/translate?lat="+lat+"&lng="+lng+"&head="+head+"&pitch="+pitch+"&fov="+String(105/(1.1*zoom))+"&zoom="+zoom+"&partitions="+String(partitions)+"&lang="+lang, function callback(response){
+            document.getElementById('img_src').setAttribute("src","https://maps.googleapis.com/maps/api/streetview?location="+lat+","+lng+"&size=800x550&key=AIzaSyAi5tI84OEg4rQ05u7GPC9Ja9AIQ4z0ni4&heading="+head+"&pitch="+pitch+"&fov="+String(105/(1.1*zoom)));
+
+            if(response != null){
+            var resp = JSON.parse(response)
+            var list = resp.textAnnotations;
+
+            if(lang == 'en'){
+
+              for (i = 0; i < no_trans; i++){
+                  list[i].desc_trans = list[i].description;
+              }
+
+            } else{
+
+              console.log(lang)
+
+            var request_translate = "https://www.googleapis.com/language/translate/v2?key=AIzaSyAi5tI84OEg4rQ05u7GPC9Ja9AIQ4z0ni4&source="+lang+"&target=en"
+
+            for (i = 0; i < no_trans; i++){
+
+              request_translate += "&q=" + list[i].description;
+            }
+          }
+          console.log(request_translate)
+          if(lang != 'en'){
+
+            httpGetAsync(request_translate, function callback(trans_response){
+
+              resp = JSON.parse(trans_response);
+              console.log(resp);
+              for (i = 0; i < no_trans; i++){
+                list[i].desc_trans = String(resp.data.translations[i].translatedText);
+
+              }
+
+            for(i = 0; i < no_trans; i++){
+
+              c2.fillStyle = "rgba(255, 255, 255, 0.5)";
+              c2.beginPath();
+              c2.moveTo(list[i].boundingPoly.vertices[0].x, list[i].boundingPoly.vertices[0].y);
+              c2.lineTo(list[i].boundingPoly.vertices[1].x, list[i].boundingPoly.vertices[1].y);
+              c2.lineTo(list[i].boundingPoly.vertices[2].x, list[i].boundingPoly.vertices[2].y);
+              c2.lineTo(list[i].boundingPoly.vertices[3].x, list[i].boundingPoly.vertices[3].y);
+              c2.closePath();
+              c2.fill();
+
+              avg_x = (parseInt(list[i].boundingPoly.vertices[0].x)+parseInt(list[i].boundingPoly.vertices[1].x)+parseInt(list[i].boundingPoly.vertices[2].x)+parseInt(list[i].boundingPoly.vertices[3].x))/4;
+
+              avg_y = (parseInt(list[i].boundingPoly.vertices[0].y) + parseInt(list[i].boundingPoly.vertices[1].y) + parseInt(list[i].boundingPoly.vertices[2].y) + parseInt(list[i].boundingPoly.vertices[3].y))/4;
+
+              
+              var para = document.createElement("p");
+              var node = document.createTextNode(list[i].desc_trans);
+              para.appendChild(node);
+              para.setAttribute("class", "btn-success");
+              para.setAttribute("data-toggle", "tooltip");
+              para.setAttribute("data-placement", "bottom");
+              para.setAttribute("title", list[i].description);
+              para.setAttribute("onclick", "window.open('https://translate.google.ca/#auto/"+lang+"/"+list[i].description+"');");
+              para.setAttribute("style", "z-index:8;position:absolute;left:" + String(avg_x) + "px;top:" + String(avg_y) + "px; background-color: rgba(92,184,92,0.8);");
+
+              document.getElementById("labels").appendChild(para);
+
+              $('[data-toggle=tooltip]').tooltip();
+              
+            }
+
+          }
+
+      );
+
+    }else{
+      for(i = 0; i < no_trans; i++){
+
+              c2.fillStyle = "rgba(255, 255, 255, 0.5)";
+              c2.beginPath();
+              c2.moveTo(list[i].boundingPoly.vertices[0].x, list[i].boundingPoly.vertices[0].y);
+              c2.lineTo(list[i].boundingPoly.vertices[1].x, list[i].boundingPoly.vertices[1].y);
+              c2.lineTo(list[i].boundingPoly.vertices[2].x, list[i].boundingPoly.vertices[2].y);
+              c2.lineTo(list[i].boundingPoly.vertices[3].x, list[i].boundingPoly.vertices[3].y);
+              c2.closePath();
+              c2.fill();
+
+              avg_x = (parseInt(list[i].boundingPoly.vertices[0].x)+parseInt(list[i].boundingPoly.vertices[1].x)+parseInt(list[i].boundingPoly.vertices[2].x)+parseInt(list[i].boundingPoly.vertices[3].x))/4;
+
+              avg_y = (parseInt(list[i].boundingPoly.vertices[0].y) + parseInt(list[i].boundingPoly.vertices[1].y) + parseInt(list[i].boundingPoly.vertices[2].y) + parseInt(list[i].boundingPoly.vertices[3].y))/4;
+
+              var para = document.createElement("p");
+              var node = document.createTextNode(list[i].desc_trans);
+              para.appendChild(node);
+              para.setAttribute("class", "btn-success");
+              para.setAttribute("data-toggle", "tooltip");
+              para.setAttribute("data-placement", "bottom");
+              para.setAttribute("title", list[i].description);
+              para.setAttribute("onclick", "window.open('https://translate.google.ca/#auto/"+lang+"/"+list[i].description+"');");
+              para.setAttribute("style", "z-index:8;position:absolute;left:" + String(avg_x) + "px;top:" + String(avg_y) + "px; background-color: rgba(92,184,92,0.8);");
+
+              document.getElementById("labels").appendChild(para);
+
+              $('[data-toggle=tooltip]').tooltip();
+
+  }}}});
+}
 
       document.getElementById("process_button").onclick = function translate() {
 
@@ -58,6 +210,13 @@
         while (myNode.firstChild) {
             myNode.removeChild(myNode.firstChild);
         }
+
+        var c = document.getElementById("myCanvas");
+
+        c2 = c.getContext('2d');
+
+        c2.clearRect(0, 0, 660, 550)
+
 
         var partitions = document.getElementById("partitions_field").value;
 
@@ -101,20 +260,36 @@
             console.log(resp);
             var list = resp.response;
 
+            if(lang == 'en'){
+
+              for (i = 0; i < list.length; i++){
+                  list[i].desc_trans = list[i].desc;
+              }
+
+            } else{
+
             var request_translate = "https://www.googleapis.com/language/translate/v2?key=AIzaSyAi5tI84OEg4rQ05u7GPC9Ja9AIQ4z0ni4&source=en&target="+lang
 
             for (i = 0; i < list.length; i++){
 
               request_translate += "&q=" + list[i].desc;
             }
+          }
+
+          if(lang != 'en'){
 
             httpGetAsync(request_translate, function callback(response){
 
+              
+
               var resp = JSON.parse(response);
+
               for (i = 0; i < list.length; i++){
                 list[i].desc_trans = String(resp.data.translations[i].translatedText);
 
               }
+              
+              
 
               for (i = 0; i < list.length; i++){
               var para = document.createElement("button");
@@ -133,12 +308,29 @@
 
             }
             });
+            }
+          else{
+            for (i = 0; i < list.length; i++){
+              var para = document.createElement("button");
+              var node = document.createTextNode(list[i].desc_trans);
+              para.appendChild(node);
+              para.setAttribute("class", "btn-success");
+              para.setAttribute("data-toggle", "tooltip");
+              para.setAttribute("data-placement", "bottom");
+              para.setAttribute("title", list[i].desc);
+              para.setAttribute("onclick", "window.open('https://translate.google.ca/#auto/"+lang+"/"+list[i].desc_trans+"');");
+              para.setAttribute("style", "z-index:8;position:absolute;left:" + String(list[i].xpos) + "px;top:" + String(list[i].ypos) + "px; background-color: rgba(92,184,92,0.8);");
 
+              document.getElementById("labels").appendChild(para);
+
+              $('[data-toggle=tooltip]').tooltip();
+          }
             console.log(list);
+          }
 
         });
 
-      };
+      }
 
       function httpGetAsync(theUrl, callback)
         {
@@ -150,6 +342,7 @@
             xmlHttp.open("GET", theUrl, true); // true for asynchronous 
             xmlHttp.send(null);
         }
+
     </script>
     <script   src="https://code.jquery.com/jquery-3.1.0.min.js"   integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="   crossorigin="anonymous"></script>
 
