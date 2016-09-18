@@ -10,7 +10,7 @@
      <div class="col-md-6">
     <div id="map" style='height:550px; width:100%;padding-left: 16px;'></div>
      </div>
-          <img src="logo.png" style="width:200x;height:115px; margin: 0 auto; left:0;right:0;position:absolute;">
+          <img src="{{ url_for('static', filename = 'logo.png') }}" style="width:200x;height:115px; margin: 0 auto; left:0;right:0;position:absolute;z-index: 10;">
           <button class="btn btn-success btn-lg" id = 'process_button' type="submit" style='top:210px;margin:0 auto;left:0;right:0;position:absolute;z-index: 10;width:120px;'>Immersify</button>
 
           <form style="width:30px;">
