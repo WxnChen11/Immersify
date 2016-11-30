@@ -1,6 +1,9 @@
 # Immersify
 HacktheNorth 2016
 
+![Demo](/Demo2.png "Demo")
+Labelling objects in German, with mouseover translation
+
 To run: Clone repository and run app.py. Requires python Flask and opencv. Note: There are request limits set on the API key! If the request limit has been reached please contact wx.chen@mail.utoronto.ca
 
 ## Inspiration
@@ -26,7 +29,7 @@ How to handle asynchronous code, how to use google's API's, how get and post req
 Polishing up the user interface, and improving the translation feature, as it currently picks up a lot of noise from the image background
 
 ![Demo](/Demo1.png "Demo")
-
-![Demo](/Demo2.png "Demo")
+Labelling objects in French 
 
 ![Demo](/Demo3.png "Demo")
+Labelling objects in English
