@@ -25,8 +25,8 @@ How to handle asynchronous code, how to use google's API's, how get and post req
 ## What's next for Immersify
 Polishing up the user interface, and improving the translation feature, as it currently picks up a lot of noise from the image background
 
-![Demo](/demo1.png "Demo")
+![Demo](/Demo1.png "Demo")
 
-![Demo](/demo2.png "Demo")
+![Demo](/Demo2.png "Demo")
 
-![Demo](/demo3.png "Demo")
+![Demo](/Demo3.png "Demo")
